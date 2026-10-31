@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { distanceTo31 } from '../games/eenendertigen'
 import { toepenRoundPenalties } from '../games/toepen'
@@ -14,6 +13,7 @@ import { formatNumber } from '../utils/format'
 
 interface Props {
   game: Game
+  open: boolean
   onCorrect: (roundId: string) => void
   correctingId: string | null
 }
@@ -127,61 +127,92 @@ function summarizeRound(
   return lines
 }
 
-export function RoundHistory({ game, onCorrect, correctingId }: Props) {
-  const { t, i18n } = useTranslation()
-  const [open, setOpen] = useState(true)
+/** Counter-clockwise history clock for the round subtitle row. */
+export function HistoryClockButton({
+  disabled,
+  open,
+  onClick,
+  label,
+}: {
+  disabled: boolean
+  open: boolean
+  onClick: () => void
+  label: string
+}) {
+  return (
+    <button
+      type="button"
+      className={`history-clock-btn ${open ? 'is-open' : ''}`}
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      aria-expanded={open}
+      title={label}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="22"
+        height="22"
+        aria-hidden="true"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="12" r="8.25" />
+        <path d="M12 7.5v5l3 1.75" />
+        {/* counter-clockwise arrow */}
+        <path d="M7.2 6.4A8.3 8.3 0 0 0 5.4 12" />
+        <path d="M7.2 6.4l-.15 2.6M7.2 6.4l2.35.85" />
+      </svg>
+    </button>
+  )
+}
 
-  if (game.rounds.length === 0) return null
+export function RoundHistory({ game, open, onCorrect, correctingId }: Props) {
+  const { t, i18n } = useTranslation()
+
+  if (!open || game.rounds.length === 0) return null
 
   return (
-    <section className="panel">
-      <button
-        type="button"
-        className="history-toggle"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-      >
+    <section className="panel history-panel">
+      <div className="history-panel-head">
         <h2>{t('history.title')}</h2>
         <span className="history-toggle-meta">
           {t('history.count', { n: game.rounds.length })}
-          <span aria-hidden>{open ? ' ▾' : ' ▸'}</span>
         </span>
-      </button>
-
-      {open && (
-        <div className="history-list">
-          {[...game.rounds].reverse().map((round, reverseIndex) => {
-            const roundNumber = game.rounds.length - reverseIndex
-            const lines = summarizeRound(game, round, i18n.language, t)
-            const isCorrecting = correctingId === round.id
-            return (
-              <article
-                key={round.id}
-                className={`history-item ${isCorrecting ? 'is-correcting' : ''}`}
-              >
-                <div className="history-item-head">
-                  <strong>{t('play.round', { n: roundNumber })}</strong>
-                  <button
-                    type="button"
-                    className="btn"
-                    disabled={Boolean(correctingId) && !isCorrecting}
-                    onClick={() => onCorrect(round.id)}
-                  >
-                    {isCorrecting
-                      ? t('history.correcting')
-                      : t('play.correct')}
-                  </button>
-                </div>
-                <ul className="history-lines">
-                  {lines.map((line, i) => (
-                    <li key={i}>{line}</li>
-                  ))}
-                </ul>
-              </article>
-            )
-          })}
-        </div>
-      )}
+      </div>
+      <div className="history-list">
+        {[...game.rounds].reverse().map((round, reverseIndex) => {
+          const roundNumber = game.rounds.length - reverseIndex
+          const lines = summarizeRound(game, round, i18n.language, t)
+          const isCorrecting = correctingId === round.id
+          return (
+            <article
+              key={round.id}
+              className={`history-item ${isCorrecting ? 'is-correcting' : ''}`}
+            >
+              <div className="history-item-head">
+                <strong>{t('play.round', { n: roundNumber })}</strong>
+                <button
+                  type="button"
+                  className="btn"
+                  disabled={Boolean(correctingId) && !isCorrecting}
+                  onClick={() => onCorrect(round.id)}
+                >
+                  {isCorrecting ? t('history.correcting') : t('play.correct')}
+                </button>
+              </div>
+              <ul className="history-lines">
+                {lines.map((line, i) => (
+                  <li key={i}>{line}</li>
+                ))}
+              </ul>
+            </article>
+          )
+        })}
+      </div>
     </section>
   )
 }

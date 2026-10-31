@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RoundHistory } from '../components/RoundHistory'
+import {
+  HistoryClockButton,
+  RoundHistory,
+} from '../components/RoundHistory'
 import { Scoreboard } from '../components/Scoreboard'
 import { ToepenRoundForm } from '../components/ToepenRoundForm'
 import { WheelModal } from '../components/WheelModal'
@@ -49,6 +52,7 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
   )
   /** Bump to remount Toepen form after submit/cancel. */
   const [toepenFormKey, setToepenFormKey] = useState(0)
+  const [historyOpen, setHistoryOpen] = useState(false)
 
   const wheelSettings = game.settings.wheel
 
@@ -293,13 +297,31 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
       </div>
 
       <h1 className="screen-title">{gameTitle}</h1>
-      <p className="muted-on-felt">
-        {t('play.round', { n: game.rounds.length + (correctingId ? 0 : 1) })}
-        {game.type === 'hartenjagen' && game.phase
-          ? ` · ${t('hartenjagen.phase', { n: game.phase })}`
-          : ''}
-        {correctingId ? ` · ${t('play.correctTitle')}` : ''}
-      </p>
+      <div className="round-line">
+        <p className="muted-on-felt">
+          {t('play.round', { n: game.rounds.length + (correctingId ? 0 : 1) })}
+          {game.type === 'hartenjagen' && game.phase
+            ? ` · ${t('hartenjagen.phase', { n: game.phase })}`
+            : ''}
+          {correctingId ? ` · ${t('play.correctTitle')}` : ''}
+        </p>
+        <HistoryClockButton
+          disabled={game.rounds.length === 0}
+          open={historyOpen}
+          label={t('history.title')}
+          onClick={() => setHistoryOpen((v) => !v)}
+        />
+      </div>
+
+      <RoundHistory
+        game={game}
+        open={historyOpen}
+        correctingId={correctingId}
+        onCorrect={(roundId) => {
+          beginCorrect(roundId)
+          setHistoryOpen(true)
+        }}
+      />
 
       <section className="panel">
         <h2>{t('play.scoreboard')}</h2>
@@ -342,12 +364,6 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
           )}
         </div>
       </section>
-
-      <RoundHistory
-        game={game}
-        correctingId={correctingId}
-        onCorrect={beginCorrect}
-      />
 
       {game.status === 'playing' &&
         game.type === 'toepen' &&

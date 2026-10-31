@@ -542,20 +542,49 @@ a.link-btn {
   width: 100%;
 }
 
-.history-toggle {
+.round-line {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  width: 100%;
-  border: none;
-  background: transparent;
-  padding: 0;
-  text-align: left;
-  color: inherit;
 }
 
-.history-toggle h2 {
+.round-line .muted-on-felt {
+  margin: 0;
+}
+
+.history-clock-btn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(247, 243, 232, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(247, 243, 232, 0.9);
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.history-clock-btn.is-open {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(232, 184, 74, 0.14);
+}
+
+.history-clock-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.history-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.history-panel-head h2 {
   margin: 0;
 }
 
