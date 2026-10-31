@@ -14,6 +14,7 @@
   },
   "home": {
     "chooseGame": "Choose a game",
+    "continue": "Continue",
     "toepen": "Toepen",
     "toepenDesc": "Toepen, fold or stay — until one remains",
     "hartenjagen": "Hearts",
