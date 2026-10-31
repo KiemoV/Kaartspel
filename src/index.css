@@ -524,59 +524,127 @@ html[data-theme='light'] .chip-btn {
 .wheel-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(4, 12, 8, 0.72);
+  background: rgba(4, 12, 8, 0.78);
   display: grid;
-  place-items: center;
-  padding: 1rem;
+  align-items: end;
+  justify-items: center;
+  padding:
+    max(0.75rem, env(safe-area-inset-top))
+    max(0.75rem, env(safe-area-inset-right))
+    max(0.75rem, env(safe-area-inset-bottom))
+    max(0.75rem, env(safe-area-inset-left));
   z-index: 40;
+  overflow-y: auto;
   animation: fade 0.2s ease both;
+}
+
+@media (min-width: 520px) {
+  .wheel-overlay {
+    align-items: center;
+  }
 }
 
 .wheel-panel {
   width: min(420px, 100%);
+  max-height: min(92dvh, 760px);
+  overflow-y: auto;
   background: var(--surface);
-  border-radius: 1.4rem;
-  padding: 1.25rem;
+  color: var(--text);
+  border-radius: 1.25rem 1.25rem 1rem 1rem;
+  padding: 1rem 1rem 1.15rem;
   display: grid;
-  gap: 1rem;
-  justify-items: center;
+  gap: 0.75rem;
+  justify-items: stretch;
   box-shadow: var(--shadow);
 }
 
-.wheel-disc {
-  width: min(280px, 78vw);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  border: 8px solid var(--gold);
-  position: relative;
-  overflow: hidden;
-  transition: transform 3.2s cubic-bezier(0.12, 0.75, 0.08, 1);
-  background: conic-gradient(
-    from 0deg,
-    #1f6b45,
-    #c4922a,
-    #1f6b45,
-    #8ec9a5,
-    #c4922a,
-    #1f6b45
-  );
+.wheel-header {
+  text-align: center;
+}
+
+.wheel-header h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+}
+
+.wheel-header p {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+}
+
+.wheel-stage {
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  padding: 0.15rem 0 0.35rem;
 }
 
 .wheel-pointer {
   width: 0;
   height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-bottom: 22px solid var(--gold);
-  margin-bottom: -6px;
-  z-index: 1;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-bottom: 18px solid var(--gold);
+  margin-bottom: -4px;
+  z-index: 2;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+.wheel-disc-wrap {
+  width: min(270px, 72vw, 46dvh);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 6px solid var(--gold);
+  background: #0a2f1e;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 2px rgba(10, 47, 30, 0.4);
+}
+
+.wheel-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform-origin: 50% 50%;
+  transition: transform 3.4s cubic-bezier(0.12, 0.75, 0.08, 1);
 }
 
 .wheel-result {
-  font-family: var(--font-display);
-  font-size: 1.35rem;
   text-align: center;
-  min-height: 2em;
+  min-height: 3.2rem;
+  display: grid;
+  align-content: center;
+  gap: 0.15rem;
+}
+
+.wheel-result-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.wheel-result-value {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+.wheel-result-value.is-muted {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+}
+
+.wheel-actions {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.wheel-actions .btn {
+  flex: 1;
 }
 
 .install-hint {

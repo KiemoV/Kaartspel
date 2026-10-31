@@ -163,7 +163,10 @@
     "forPlayer": "For {{name}}",
     "result": "Result",
     "continue": "Continue",
-    "skip": "Skip"
+    "skip": "Skip",
+    "spinHint": "Spin the wheel",
+    "spinning": "Spinning…",
+    "empty": "No segments in this set."
   },
   "winner": {
     "title": "Winner!",

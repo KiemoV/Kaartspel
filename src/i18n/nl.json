@@ -163,7 +163,10 @@
     "forPlayer": "Voor {{name}}",
     "result": "Uitslag",
     "continue": "Verder",
-    "skip": "Overslaan"
+    "skip": "Overslaan",
+    "spinHint": "Draai het rad",
+    "spinning": "Het rad draait…",
+    "empty": "Geen vakjes in deze set."
   },
   "winner": {
     "title": "Winnaar!",
