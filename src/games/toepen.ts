@@ -37,13 +37,14 @@ export function toepenRoundPenalties(
     add(id, input.finalStake)
   }
 
-  if (input.swap && input.swap.lookerIds.length > 0) {
-    if (input.swap.justified) {
-      for (const id of input.swap.lookerIds) {
+  for (const swap of input.swaps) {
+    if (swap.lookerIds.length === 0) continue
+    if (swap.justified) {
+      for (const id of swap.lookerIds) {
         add(id, 1)
       }
     } else {
-      add(input.swap.requesterId, 1)
+      add(swap.requesterId, 1)
     }
   }
 

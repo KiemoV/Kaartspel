@@ -9,6 +9,7 @@ describe('toepen', () => {
       finalStake: 2,
       folds: [{ playerId: 'p1', stake: 1 }],
       loserIds: ['p2'],
+      swaps: [],
     })
     expect(penalties).toEqual({ p1: 1, p2: 2 })
   })
@@ -18,11 +19,13 @@ describe('toepen', () => {
       finalStake: 2,
       folds: [],
       loserIds: ['p1'],
-      swap: {
-        requesterId: 'p1',
-        lookerIds: ['p2'],
-        justified: false,
-      },
+      swaps: [
+        {
+          requesterId: 'p1',
+          lookerIds: ['p2'],
+          justified: false,
+        },
+      ],
     })
     expect(penalties.p1).toBe(3) // lost 2 + unjustified 1
     expect(penalties.p2).toBeUndefined()
@@ -33,13 +36,38 @@ describe('toepen', () => {
       finalStake: 1,
       folds: [],
       loserIds: ['p3'],
-      swap: {
-        requesterId: 'p1',
-        lookerIds: ['p2'],
-        justified: true,
-      },
+      swaps: [
+        {
+          requesterId: 'p1',
+          lookerIds: ['p2'],
+          justified: true,
+        },
+      ],
     })
     expect(penalties).toEqual({ p3: 1, p2: 1 })
+  })
+
+  it('supports multiple card swaps in one round', () => {
+    const penalties = toepenRoundPenalties({
+      finalStake: 1,
+      folds: [],
+      loserIds: ['p3'],
+      swaps: [
+        {
+          requesterId: 'p1',
+          lookerIds: ['p2'],
+          justified: false, // p1 +1
+        },
+        {
+          requesterId: 'p2',
+          lookerIds: ['p1'],
+          justified: true, // p1 +1 again as looker
+        },
+      ],
+    })
+    expect(penalties.p1).toBe(2)
+    expect(penalties.p2).toBeUndefined()
+    expect(penalties.p3).toBe(1)
   })
 
   it('swap without lookers adds no swap penalty', () => {
@@ -47,11 +75,13 @@ describe('toepen', () => {
       finalStake: 1,
       folds: [],
       loserIds: ['p1'],
-      swap: {
-        requesterId: 'p2',
-        lookerIds: [],
-        justified: false,
-      },
+      swaps: [
+        {
+          requesterId: 'p2',
+          lookerIds: [],
+          justified: false,
+        },
+      ],
     })
     expect(penalties).toEqual({ p1: 1 })
   })
@@ -65,6 +95,7 @@ describe('toepen', () => {
       finalStake: 2,
       folds: [{ playerId: 'p1', stake: 1 }],
       loserIds: ['p2'],
+      swaps: [],
     }
     game = applyRound(game, round)
     expect(game.players.find((p) => p.id === 'p1')?.value).toBe(1)
@@ -75,6 +106,7 @@ describe('toepen', () => {
       finalStake: 3,
       folds: [],
       loserIds: ['p2'],
+      swaps: [],
     })
     expect(game.players.find((p) => p.id === 'p2')?.value).toBe(5)
     expect(game.players.find((p) => p.id === 'p2')?.status).toBe('active')
@@ -83,6 +115,7 @@ describe('toepen', () => {
       finalStake: 1,
       folds: [],
       loserIds: ['p2'],
+      swaps: [],
     })
     expect(game.players.find((p) => p.id === 'p2')?.value).toBe(6)
     expect(game.players.find((p) => p.id === 'p2')?.status).toBe('out')
@@ -96,6 +129,7 @@ describe('toepen', () => {
       finalStake: 5,
       folds: [],
       loserIds: ['p1'],
+      swaps: [],
     })
     expect(game.players.find((p) => p.id === 'p1')?.status).toBe('out')
   })
@@ -108,6 +142,7 @@ describe('toepen', () => {
       finalStake: 3,
       folds: [],
       loserIds: ['p1'],
+      swaps: [],
     })
     expect(game.status).toBe('finished')
     expect(game.winnerId).toBe('p2')
@@ -121,12 +156,14 @@ describe('toepen', () => {
       finalStake: 2,
       folds: [{ playerId: 'p1', stake: 1 }],
       loserIds: ['p3'],
+      swaps: [],
     })
     const roundId = game.rounds[0]!.id
     game = correctRound(game, roundId, {
       finalStake: 1,
       folds: [],
       loserIds: ['p2'],
+      swaps: [],
     })
     expect(game.players.find((p) => p.id === 'p1')?.value).toBe(0)
     expect(game.players.find((p) => p.id === 'p2')?.value).toBe(1)
@@ -149,7 +186,7 @@ describe('toepen', () => {
     })
     game = applyRound(
       game,
-      { finalStake: 1, folds: [], loserIds: ['p1'] },
+      { finalStake: 1, folds: [], loserIds: ['p1'], swaps: [] },
       { p1: 'Doe een dansje' },
     )
     const roundId = game.rounds[0]!.id
@@ -157,6 +194,7 @@ describe('toepen', () => {
       finalStake: 2,
       folds: [],
       loserIds: ['p1'],
+      swaps: [],
     })
     expect(game.rounds[0]!.wheelOutcomes).toEqual({ p1: 'Doe een dansje' })
     expect(game.players.find((p) => p.id === 'p1')?.value).toBe(2)

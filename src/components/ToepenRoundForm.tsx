@@ -1,9 +1,20 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toepenRoundPenalties } from '../games/toepen'
-import type { Player, ToepenRoundInput, ToepenSettings } from '../types/game'
+import type {
+  Player,
+  ToepenRoundInput,
+  ToepenSettings,
+  ToepenSwap,
+} from '../types/game'
 
 type Outcome = 'none' | 'fold' | 'lost'
+
+interface PlayerSwapState {
+  enabled: boolean
+  lookerIds: string[]
+  justified: boolean
+}
 
 interface Props {
   players: Player[]
@@ -12,6 +23,24 @@ interface Props {
   correcting: boolean
   onSubmit: (input: ToepenRoundInput) => void
   onCancel?: () => void
+}
+
+function initialSwaps(
+  players: Player[],
+  initial?: ToepenRoundInput,
+): Record<string, PlayerSwapState> {
+  const map: Record<string, PlayerSwapState> = {}
+  for (const p of players) {
+    const existing = initial?.swaps.find((s) => s.requesterId === p.id)
+    map[p.id] = existing
+      ? {
+          enabled: true,
+          lookerIds: [...existing.lookerIds],
+          justified: existing.justified,
+        }
+      : { enabled: false, lookerIds: [], justified: false }
+  }
+  return map
 }
 
 export function ToepenRoundForm({
@@ -45,16 +74,8 @@ export function ToepenRoundForm({
     }
     return map
   })
-
-  const [swapEnabled, setSwapEnabled] = useState(Boolean(initial?.swap))
-  const [requesterId, setRequesterId] = useState(
-    initial?.swap?.requesterId ?? players[0]?.id ?? '',
-  )
-  const [lookerIds, setLookerIds] = useState<string[]>(
-    initial?.swap?.lookerIds ?? [],
-  )
-  const [justified, setJustified] = useState(
-    initial?.swap?.justified ?? false,
+  const [swaps, setSwaps] = useState<Record<string, PlayerSwapState>>(() =>
+    initialSwaps(players, initial),
   )
 
   const setOutcome = (id: string, outcome: Outcome) => {
@@ -67,10 +88,47 @@ export function ToepenRoundForm({
     }
   }
 
-  const toggleLooker = (id: string) => {
-    setLookerIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    )
+  const setSwapEnabled = (id: string, enabled: boolean) => {
+    setSwaps((prev) => ({
+      ...prev,
+      [id]: {
+        enabled,
+        lookerIds: enabled ? (prev[id]?.lookerIds ?? []) : [],
+        justified: enabled ? (prev[id]?.justified ?? false) : false,
+      },
+    }))
+  }
+
+  const toggleLooker = (requesterId: string, lookerId: string) => {
+    setSwaps((prev) => {
+      const current = prev[requesterId] ?? {
+        enabled: true,
+        lookerIds: [],
+        justified: false,
+      }
+      const lookerIds = current.lookerIds.includes(lookerId)
+        ? current.lookerIds.filter((x) => x !== lookerId)
+        : [...current.lookerIds, lookerId]
+      return {
+        ...prev,
+        [requesterId]: { ...current, enabled: true, lookerIds },
+      }
+    })
+  }
+
+  const setJustified = (requesterId: string, justified: boolean) => {
+    setSwaps((prev) => ({
+      ...prev,
+      [requesterId]: {
+        ...(prev[requesterId] ?? {
+          enabled: true,
+          lookerIds: [],
+          justified: false,
+        }),
+        enabled: true,
+        justified,
+      },
+    }))
   }
 
   const draft: ToepenRoundInput = useMemo(() => {
@@ -84,129 +142,32 @@ export function ToepenRoundForm({
       .filter((p) => outcomes[p.id] === 'lost')
       .map((p) => p.id)
 
-    const input: ToepenRoundInput = {
+    const swapList: ToepenSwap[] = players
+      .filter((p) => swaps[p.id]?.enabled)
+      .map((p) => ({
+        requesterId: p.id,
+        lookerIds: (swaps[p.id]?.lookerIds ?? []).filter((id) => id !== p.id),
+        justified: swaps[p.id]?.justified ?? false,
+      }))
+
+    return {
       finalStake,
       folds,
       loserIds,
+      swaps: swapList,
     }
-    if (swapEnabled && requesterId) {
-      input.swap = {
-        requesterId,
-        lookerIds: lookerIds.filter((id) => id !== requesterId),
-        justified,
-      }
-    }
-    return input
-  }, [
-    players,
-    outcomes,
-    foldStakes,
-    finalStake,
-    startStake,
-    swapEnabled,
-    requesterId,
-    lookerIds,
-    justified,
-  ])
+  }, [players, outcomes, foldStakes, finalStake, startStake, swaps])
 
   const preview = toepenRoundPenalties(draft)
   const hasResult =
     draft.folds.length > 0 ||
     draft.loserIds.length > 0 ||
-    (draft.swap !== undefined &&
-      draft.swap.lookerIds.length > 0)
+    draft.swaps.some((s) => s.lookerIds.length > 0)
 
   return (
     <section className="panel">
       <h2>{t('toepen.roundTitle')}</h2>
       <p className="hint">{t('toepen.roundHint')}</p>
-
-      <div className="field">
-        <label>{t('toepen.swapTitle')}</label>
-        <div className="toggle-grid">
-          <button
-            type="button"
-            className={!swapEnabled ? 'is-on' : ''}
-            onClick={() => setSwapEnabled(false)}
-          >
-            {t('common.off')}
-          </button>
-          <button
-            type="button"
-            className={swapEnabled ? 'is-on' : ''}
-            onClick={() => setSwapEnabled(true)}
-          >
-            {t('common.on')}
-          </button>
-        </div>
-      </div>
-
-      {swapEnabled && (
-        <>
-          <div className="field">
-            <label>{t('toepen.swapRequester')}</label>
-            <div className="choice-list">
-              {players.map((p) => (
-                <button
-                  type="button"
-                  key={p.id}
-                  className={requesterId === p.id ? 'is-on' : ''}
-                  onClick={() => {
-                    setRequesterId(p.id)
-                    setLookerIds((prev) => prev.filter((id) => id !== p.id))
-                  }}
-                >
-                  {p.name}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="field">
-            <label>{t('toepen.swapLookers')}</label>
-            <div className="choice-list">
-              {players
-                .filter((p) => p.id !== requesterId)
-                .map((p) => (
-                  <button
-                    type="button"
-                    key={p.id}
-                    className={lookerIds.includes(p.id) ? 'is-on' : ''}
-                    onClick={() => toggleLooker(p.id)}
-                  >
-                    {p.name}
-                  </button>
-                ))}
-            </div>
-            <p className="hint">{t('toepen.swapLookersHint')}</p>
-          </div>
-          {lookerIds.length > 0 && (
-            <div className="field">
-              <label>{t('toepen.swapJustified')}</label>
-              <div className="toggle-grid">
-                <button
-                  type="button"
-                  className={justified ? 'is-on' : ''}
-                  onClick={() => setJustified(true)}
-                >
-                  {t('toepen.swapYes')}
-                </button>
-                <button
-                  type="button"
-                  className={!justified ? 'is-on' : ''}
-                  onClick={() => setJustified(false)}
-                >
-                  {t('toepen.swapNo')}
-                </button>
-              </div>
-              <p className="hint">
-                {justified
-                  ? t('toepen.swapJustifiedHint')
-                  : t('toepen.swapUnjustifiedHint')}
-              </p>
-            </div>
-          )}
-        </>
-      )}
 
       <div className="field">
         <label>{t('toepen.finalStake')}</label>
@@ -233,72 +194,157 @@ export function ToepenRoundForm({
       <div className="field">
         <label>{t('toepen.outcomes')}</label>
         <div className="toepen-outcomes">
-          {players.map((p) => (
-            <div className="toepen-outcome-row" key={p.id}>
-              <strong>{p.name}</strong>
-              <div className="toggle-grid three">
-                <button
-                  type="button"
-                  className={outcomes[p.id] === 'none' ? 'is-on' : ''}
-                  onClick={() => setOutcome(p.id, 'none')}
-                >
-                  {t('toepen.outcomeNone')}
-                </button>
-                <button
-                  type="button"
-                  className={outcomes[p.id] === 'fold' ? 'is-on' : ''}
-                  onClick={() => setOutcome(p.id, 'fold')}
-                >
-                  {t('toepen.outcomeFold')}
-                </button>
-                <button
-                  type="button"
-                  className={outcomes[p.id] === 'lost' ? 'is-on' : ''}
-                  onClick={() => setOutcome(p.id, 'lost')}
-                >
-                  {t('toepen.outcomeLost')}
-                </button>
-              </div>
-              {outcomes[p.id] === 'fold' && (
-                <div className="stepper compact">
-                  <span className="hint">{t('toepen.foldStake')}</span>
+          {players.map((p) => {
+            const swap = swaps[p.id] ?? {
+              enabled: false,
+              lookerIds: [],
+              justified: false,
+            }
+            return (
+              <div className="toepen-outcome-row" key={p.id}>
+                <strong>{p.name}</strong>
+                <div className="toggle-grid three">
                   <button
                     type="button"
-                    onClick={() =>
-                      setFoldStakes((prev) => ({
-                        ...prev,
-                        [p.id]: Math.max(startStake, (prev[p.id] ?? startStake) - 1),
-                      }))
-                    }
+                    className={outcomes[p.id] === 'none' ? 'is-on' : ''}
+                    onClick={() => setOutcome(p.id, 'none')}
                   >
-                    −
+                    {t('toepen.outcomeNone')}
                   </button>
-                  <span className="value">{foldStakes[p.id] ?? startStake}</span>
                   <button
                     type="button"
-                    onClick={() =>
-                      setFoldStakes((prev) => ({
-                        ...prev,
-                        [p.id]: (prev[p.id] ?? startStake) + 1,
-                      }))
-                    }
+                    className={outcomes[p.id] === 'fold' ? 'is-on' : ''}
+                    onClick={() => setOutcome(p.id, 'fold')}
                   >
-                    +
+                    {t('toepen.outcomeFold')}
+                  </button>
+                  <button
+                    type="button"
+                    className={outcomes[p.id] === 'lost' ? 'is-on' : ''}
+                    onClick={() => setOutcome(p.id, 'lost')}
+                  >
+                    {t('toepen.outcomeLost')}
                   </button>
                 </div>
-              )}
-              {outcomes[p.id] === 'lost' && (
-                <p className="hint">
-                  {t('toepen.lostAt', { n: finalStake })}
-                </p>
-              )}
-              {(preview[p.id] ?? 0) > 0 && (
-                <p className="distance">
-                  {t('toepen.pointsThisRound', { n: preview[p.id] })}
-                </p>
-              )}
-            </div>
-          ))}
+
+                {outcomes[p.id] === 'fold' && (
+                  <div className="stepper compact">
+                    <span className="hint">{t('toepen.foldStake')}</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFoldStakes((prev) => ({
+                          ...prev,
+                          [p.id]: Math.max(
+                            startStake,
+                            (prev[p.id] ?? startStake) - 1,
+                          ),
+                        }))
+                      }
+                    >
+                      −
+                    </button>
+                    <span className="value">
+                      {foldStakes[p.id] ?? startStake}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFoldStakes((prev) => ({
+                          ...prev,
+                          [p.id]: (prev[p.id] ?? startStake) + 1,
+                        }))
+                      }
+                    >
+                      +
+                    </button>
+                  </div>
+                )}
+                {outcomes[p.id] === 'lost' && (
+                  <p className="hint">
+                    {t('toepen.lostAt', { n: finalStake })}
+                  </p>
+                )}
+
+                <div className="field" style={{ marginTop: '0.25rem' }}>
+                  <label>{t('toepen.swapAsked')}</label>
+                  <div className="toggle-grid">
+                    <button
+                      type="button"
+                      className={!swap.enabled ? 'is-on' : ''}
+                      onClick={() => setSwapEnabled(p.id, false)}
+                    >
+                      {t('common.no')}
+                    </button>
+                    <button
+                      type="button"
+                      className={swap.enabled ? 'is-on' : ''}
+                      onClick={() => setSwapEnabled(p.id, true)}
+                    >
+                      {t('common.yes')}
+                    </button>
+                  </div>
+                </div>
+
+                {swap.enabled && (
+                  <>
+                    <div className="field">
+                      <label>{t('toepen.swapLookers')}</label>
+                      <div className="choice-list">
+                        {players
+                          .filter((other) => other.id !== p.id)
+                          .map((other) => (
+                            <button
+                              type="button"
+                              key={other.id}
+                              className={
+                                swap.lookerIds.includes(other.id) ? 'is-on' : ''
+                              }
+                              onClick={() => toggleLooker(p.id, other.id)}
+                            >
+                              {other.name}
+                            </button>
+                          ))}
+                      </div>
+                      <p className="hint">{t('toepen.swapLookersHint')}</p>
+                    </div>
+                    {swap.lookerIds.length > 0 && (
+                      <div className="field">
+                        <label>{t('toepen.swapJustified')}</label>
+                        <div className="toggle-grid">
+                          <button
+                            type="button"
+                            className={swap.justified ? 'is-on' : ''}
+                            onClick={() => setJustified(p.id, true)}
+                          >
+                            {t('toepen.swapYes')}
+                          </button>
+                          <button
+                            type="button"
+                            className={!swap.justified ? 'is-on' : ''}
+                            onClick={() => setJustified(p.id, false)}
+                          >
+                            {t('toepen.swapNo')}
+                          </button>
+                        </div>
+                        <p className="hint">
+                          {swap.justified
+                            ? t('toepen.swapJustifiedHint')
+                            : t('toepen.swapUnjustifiedHint')}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {(preview[p.id] ?? 0) > 0 && (
+                  <p className="distance">
+                    {t('toepen.pointsThisRound', { n: preview[p.id] })}
+                  </p>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
 
@@ -311,7 +357,11 @@ export function ToepenRoundForm({
         {correcting ? t('play.saveCorrection') : t('toepen.confirmRound')}
       </button>
       {correcting && onCancel && (
-        <button type="button" className="btn btn-ghost btn-block" onClick={onCancel}>
+        <button
+          type="button"
+          className="btn btn-ghost btn-block"
+          onClick={onCancel}
+        >
           {t('play.cancel')}
         </button>
       )}

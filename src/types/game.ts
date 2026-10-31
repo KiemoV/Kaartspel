@@ -76,13 +76,13 @@ export interface ToepenSwap {
 /**
  * Toepen round: start at startStake; toepen raises the stake.
  * Folders take the stake they folded at; hand losers take finalStake.
- * Optional card-swap penalties are added on top.
+ * Multiple players may request a card swap; each can have lookers.
  */
 export interface ToepenRoundInput {
   finalStake: number
   folds: ToepenFold[]
   loserIds: string[]
-  swap?: ToepenSwap
+  swaps: ToepenSwap[]
 }
 
 export interface HartenjagenRoundInput {
