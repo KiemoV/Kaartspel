@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { RoundHistory } from '../components/RoundHistory'
 import { Scoreboard } from '../components/Scoreboard'
 import { ToepenRoundForm } from '../components/ToepenRoundForm'
 import { WheelModal } from '../components/WheelModal'
@@ -253,6 +254,21 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
           | undefined)
       : undefined
 
+  const toepenFormPlayers = (() => {
+    const active = activePlayers(game)
+    if (!correctingToepen) return active
+    const ids = new Set([
+      ...active.map((p) => p.id),
+      ...correctingToepen.folds.map((f) => f.playerId),
+      ...correctingToepen.loserIds,
+      ...correctingToepen.swaps.flatMap((s) => [
+        s.requesterId,
+        ...s.lookerIds,
+      ]),
+    ])
+    return game.players.filter((p) => ids.has(p.id))
+  })()
+
   return (
     <>
       <div className="topbar">
@@ -327,12 +343,18 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
         </div>
       </section>
 
+      <RoundHistory
+        game={game}
+        correctingId={correctingId}
+        onCorrect={beginCorrect}
+      />
+
       {game.status === 'playing' &&
         game.type === 'toepen' &&
         game.settings.type === 'toepen' && (
           <ToepenRoundForm
             key={`${toepenFormKey}-${correctingId ?? 'new'}`}
-            players={activePlayers(game)}
+            players={toepenFormPlayers}
             settings={game.settings.toepen}
             initial={correctingToepen}
             correcting={Boolean(correctingId)}

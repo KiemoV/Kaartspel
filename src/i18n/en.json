@@ -138,6 +138,21 @@
     "statusSwimming": "Swimming",
     "leaveWarning": "You have a game in progress. Are you sure you want to leave?"
   },
+  "history": {
+    "title": "Round history",
+    "count": "{{n}} rounds",
+    "correcting": "Editing…",
+    "finalStake": "Final stake: {{n}}",
+    "foldLine": "{{name}} folded ({{n}})",
+    "lostLine": "{{name}} lost the hand ({{n}})",
+    "swapNoLook": "{{name}} asked for a swap (nobody looked)",
+    "swapJustified": "{{name}} swap justified — looker: {{lookers}} (+1)",
+    "swapUnjustified": "{{name}} swap unjustified (+1) — looked: {{lookers}}",
+    "totalLine": "Total: {{detail}}",
+    "handLine": "{{name}}: hand {{hand}} (distance {{dist}})",
+    "chosenLoser": "Chosen loser: {{name}}",
+    "wheelLine": "Wheel {{name}}: {{label}}"
+  },
   "wheel": {
     "title": "Wheel",
     "spin": "Spin",

@@ -138,6 +138,21 @@
     "statusSwimming": "Zwemt",
     "leaveWarning": "Je hebt een lopend spel. Weet je zeker dat je wilt vertrekken?"
   },
+  "history": {
+    "title": "Rondegeschiedenis",
+    "count": "{{n}} rondes",
+    "correcting": "Bezig…",
+    "finalStake": "Eindinzet: {{n}}",
+    "foldLine": "{{name}} opgegeven ({{n}})",
+    "lostLine": "{{name}} hand verloren ({{n}})",
+    "swapNoLook": "{{name}} wissel gevraagd (niemand keek)",
+    "swapJustified": "{{name}} wissel rechtvaardig — kijker: {{lookers}} (+1)",
+    "swapUnjustified": "{{name}} wissel onrechtvaardig (+1) — keek: {{lookers}}",
+    "totalLine": "Totaal: {{detail}}",
+    "handLine": "{{name}}: hand {{hand}} (afstand {{dist}})",
+    "chosenLoser": "Gekozen verliezer: {{name}}",
+    "wheelLine": "Rad {{name}}: {{label}}"
+  },
   "wheel": {
     "title": "Rad",
     "spin": "Draaien",
