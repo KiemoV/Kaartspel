@@ -516,6 +516,32 @@ a.link-btn {
   color: var(--text);
 }
 
+.toepen-outcomes {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.toepen-outcome-row {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.75rem;
+  border-radius: 0.9rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.toggle-grid.three {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.stepper.compact {
+  flex-wrap: wrap;
+}
+
+.stepper.compact .hint {
+  width: 100%;
+}
+
 @keyframes rise {
   from {
     opacity: 0;

@@ -60,9 +60,29 @@ export type GameSettings =
   | { type: 'hartenjagen'; hartenjagen: HartenjagenSettings; wheel: WheelSettings }
   | { type: 'eenendertigen'; eenendertigen: EenendertigenSettings; wheel: WheelSettings }
 
-export interface ToepenRoundInput {
+/** Player folded when the stake was raised; they take this many points. */
+export interface ToepenFold {
+  playerId: string
   stake: number
+}
+
+export interface ToepenSwap {
+  requesterId: string
+  lookerIds: string[]
+  /** Only matters when someone looked. */
+  justified: boolean
+}
+
+/**
+ * Toepen round: start at startStake; toepen raises the stake.
+ * Folders take the stake they folded at; hand losers take finalStake.
+ * Optional card-swap penalties are added on top.
+ */
+export interface ToepenRoundInput {
+  finalStake: number
+  folds: ToepenFold[]
   loserIds: string[]
+  swap?: ToepenSwap
 }
 
 export interface HartenjagenRoundInput {

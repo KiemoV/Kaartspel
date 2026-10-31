@@ -226,7 +226,13 @@ export function lastRoundLoserIds(game: Game): string[] {
   const after = game
 
   if (game.type === 'toepen') {
-    return (last.input as { loserIds: string[] }).loserIds
+    // Anyone who scored points this round (fold, loss, or swap penalty)
+    return after.players
+      .filter((p) => {
+        const prev = before.players.find((b) => b.id === p.id)
+        return prev && p.value > prev.value
+      })
+      .map((p) => p.id)
   }
 
   if (game.type === 'eenendertigen' && game.settings.type === 'eenendertigen') {

@@ -20,6 +20,36 @@ export function initialPlayersToepen(names: string[]): Player[] {
   }))
 }
 
+/** Points each player receives from one toepen round (hand + swap). */
+export function toepenRoundPenalties(
+  input: ToepenRoundInput,
+): Record<string, number> {
+  const penalties: Record<string, number> = {}
+  const add = (id: string, n: number) => {
+    if (n <= 0) return
+    penalties[id] = (penalties[id] ?? 0) + n
+  }
+
+  for (const fold of input.folds) {
+    add(fold.playerId, fold.stake)
+  }
+  for (const id of input.loserIds) {
+    add(id, input.finalStake)
+  }
+
+  if (input.swap && input.swap.lookerIds.length > 0) {
+    if (input.swap.justified) {
+      for (const id of input.swap.lookerIds) {
+        add(id, 1)
+      }
+    } else {
+      add(input.swap.requesterId, 1)
+    }
+  }
+
+  return penalties
+}
+
 export function applyToepenRounds(
   basePlayers: Player[],
   rounds: Game['rounds'],
@@ -33,10 +63,11 @@ export function applyToepenRounds(
 
   for (const round of rounds) {
     const input = round.input as ToepenRoundInput
-    for (const loserId of input.loserIds) {
-      const player = players.find((p) => p.id === loserId)
+    const penalties = toepenRoundPenalties(input)
+    for (const [playerId, points] of Object.entries(penalties)) {
+      const player = players.find((p) => p.id === playerId)
       if (!player || player.status === 'out') continue
-      player.value += input.stake
+      player.value += points
       if (isOut(player.value, settings)) {
         player.status = 'out'
       }
@@ -49,7 +80,6 @@ export function applyToepenRounds(
     active[0].status = 'winner'
     winnerId = active[0].id
   } else if (active.length === 0 && players.length > 0) {
-    // Edge: everyone out somehow — last who went out is not winner; pick lowest score among out
     const sorted = [...players].sort((a, b) => a.value - b.value)
     sorted[0].status = 'winner'
     winnerId = sorted[0].id

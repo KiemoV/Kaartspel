@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Scoreboard } from '../components/Scoreboard'
+import { ToepenRoundForm } from '../components/ToepenRoundForm'
 import { WheelModal } from '../components/WheelModal'
 import {
   applyRound,
@@ -37,10 +38,6 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
   const { t, i18n } = useTranslation()
   const lang = i18n.language
 
-  const [stake, setStake] = useState(
-    game.settings.type === 'toepen' ? game.settings.toepen.startStake : 1,
-  )
-  const [loserIds, setLoserIds] = useState<string[]>([])
   const [hjScores, setHjScores] = useState<Record<string, string>>({})
   const [hands, setHands] = useState<Record<string, string>>({})
   const [chosenLoserId, setChosenLoserId] = useState<string | undefined>()
@@ -49,17 +46,16 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
   const [pendingOutcomes, setPendingOutcomes] = useState<Record<string, string>>(
     {},
   )
+  /** Bump to remount Toepen form after submit/cancel. */
+  const [toepenFormKey, setToepenFormKey] = useState(0)
 
   const wheelSettings = game.settings.wheel
 
-  const resetInputs = (next: Game) => {
-    setLoserIds([])
+  const resetInputs = () => {
     setChosenLoserId(undefined)
     setHjScores({})
     setHands({})
-    if (next.settings.type === 'toepen') {
-      setStake(next.settings.toepen.startStake)
-    }
+    setToepenFormKey((k) => k + 1)
   }
 
   const buildWheelQueue = (next: Game, previous: Game): WheelQueueItem[] => {
@@ -105,14 +101,14 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
       const next = correctRound(game, correctingId, input)
       onChange(next)
       setCorrectingId(null)
-      resetInputs(next)
+      resetInputs()
       maybeFinish(next, 0)
       return
     }
     const next = applyRound(game, input)
     const queue = buildWheelQueue(next, game)
     onChange(next)
-    resetInputs(next)
+    resetInputs()
     if (queue.length > 0) {
       setPendingOutcomes({})
       setWheelQueue(queue)
@@ -160,28 +156,19 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
     }
   }
 
-  const toggleLoser = (id: string) => {
-    setLoserIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    )
-  }
-
   const beginCorrect = (roundId: string) => {
     const round = game.rounds.find((r) => r.id === roundId)
     if (!round) return
     setCorrectingId(roundId)
-    if (game.type === 'toepen') {
-      const input = round.input as ToepenRoundInput
-      setStake(input.stake)
-      setLoserIds([...input.loserIds])
-    } else if (game.type === 'hartenjagen') {
+    setToepenFormKey((k) => k + 1)
+    if (game.type === 'hartenjagen') {
       const input = round.input as HartenjagenRoundInput
       const mapped: Record<string, string> = {}
       for (const [id, v] of Object.entries(input.scores)) {
         mapped[id] = formatNumber(v, lang)
       }
       setHjScores(mapped)
-    } else {
+    } else if (game.type === 'eenendertigen') {
       const input = round.input as EenendertigenRoundInput
       const mapped: Record<string, string> = {}
       for (const [id, v] of Object.entries(input.hands)) {
@@ -206,11 +193,6 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
     return lows.length > 1 ? lows.map((l) => l.id) : []
   }, [game, hands])
 
-  const submitToepen = () => {
-    if (loserIds.length === 0) return
-    commitRound({ stake, loserIds })
-  }
-
   const submitHartenjagen = () => {
     const alive = activePlayers(game)
     const scores: Record<string, number> = {}
@@ -229,7 +211,6 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
       const n = parseLocaleNumber(hands[p.id] ?? '')
       if (n === null) return
       if (n < 0 || n > 31) return
-      // allow 0.5 steps
       if (Math.round(n * 2) !== n * 2) return
       parsedHands[p.id] = n
     }
@@ -264,6 +245,13 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
       : game.type === 'hartenjagen'
         ? t('home.hartenjagen')
         : t('home.eenendertigen')
+
+  const correctingToepen =
+    correctingId && game.type === 'toepen'
+      ? (game.rounds.find((r) => r.id === correctingId)?.input as
+          | ToepenRoundInput
+          | undefined)
+      : undefined
 
   return (
     <>
@@ -308,7 +296,7 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
             onClick={() => {
               const next = undoLastRound(game)
               onChange(next)
-              resetInputs(next)
+              resetInputs()
             }}
           >
             {t('play.undo')}
@@ -317,18 +305,20 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
             <button
               type="button"
               className="btn"
-              onClick={() => beginCorrect(game.rounds[game.rounds.length - 1]!.id)}
+              onClick={() =>
+                beginCorrect(game.rounds[game.rounds.length - 1]!.id)
+              }
             >
               {t('play.correct')}
             </button>
           )}
-          {correctingId && (
+          {correctingId && game.type !== 'toepen' && (
             <button
               type="button"
               className="btn btn-ghost"
               onClick={() => {
                 setCorrectingId(null)
-                resetInputs(game)
+                resetInputs()
               }}
             >
               {t('play.cancel')}
@@ -337,51 +327,22 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
         </div>
       </section>
 
-      {game.status === 'playing' && game.type === 'toepen' && (
-        <section className="panel">
-          <h2>{t('toepen.stake')}</h2>
-          <div className="stepper">
-            <button
-              type="button"
-              onClick={() => setStake((s) => Math.max(1, s - 1))}
-              aria-label="-"
-            >
-              −
-            </button>
-            <span className="value">{stake}</span>
-            <button
-              type="button"
-              onClick={() => setStake((s) => s + 1)}
-              aria-label="+"
-            >
-              +
-            </button>
-          </div>
-          <div className="field">
-            <label>{t('toepen.losers')}</label>
-            <div className="choice-list">
-              {activePlayers(game).map((p) => (
-                <button
-                  type="button"
-                  key={p.id}
-                  className={loserIds.includes(p.id) ? 'is-on' : ''}
-                  onClick={() => toggleLoser(p.id)}
-                >
-                  {p.name}
-                </button>
-              ))}
-            </div>
-          </div>
-          <button
-            type="button"
-            className="btn btn-primary btn-block"
-            disabled={loserIds.length === 0}
-            onClick={submitToepen}
-          >
-            {correctingId ? t('play.saveCorrection') : t('toepen.confirmRound')}
-          </button>
-        </section>
-      )}
+      {game.status === 'playing' &&
+        game.type === 'toepen' &&
+        game.settings.type === 'toepen' && (
+          <ToepenRoundForm
+            key={`${toepenFormKey}-${correctingId ?? 'new'}`}
+            players={activePlayers(game)}
+            settings={game.settings.toepen}
+            initial={correctingToepen}
+            correcting={Boolean(correctingId)}
+            onSubmit={commitRound}
+            onCancel={() => {
+              setCorrectingId(null)
+              resetInputs()
+            }}
+          />
+        )}
 
       {game.status === 'playing' && game.type === 'hartenjagen' && (
         <section className="panel">
