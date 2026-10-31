@@ -5,11 +5,12 @@ import { useBeforeUnload } from './hooks/useBeforeUnload'
 import { useTheme } from './hooks/useTheme'
 import { HomeScreen } from './screens/HomeScreen'
 import { PlayScreen } from './screens/PlayScreen'
+import { PrivacyScreen } from './screens/PrivacyScreen'
 import { SetupScreen, type SetupResult } from './screens/SetupScreen'
 import { WinnerScreen } from './screens/WinnerScreen'
 import type { Game, GameType } from './types/game'
 
-type Screen = 'home' | 'setup' | 'play' | 'winner'
+type Screen = 'home' | 'setup' | 'play' | 'winner' | 'privacy'
 
 export default function App() {
   const { t } = useTranslation()
@@ -44,7 +45,11 @@ export default function App() {
           onSelect={handleSelect}
           themeMode={mode}
           onThemeChange={setMode}
+          onPrivacy={() => setScreen('privacy')}
         />
+      )}
+      {screen === 'privacy' && (
+        <PrivacyScreen onBack={() => setScreen('home')} />
       )}
       {screen === 'setup' && selectedType && (
         <SetupScreen

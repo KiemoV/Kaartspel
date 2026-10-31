@@ -19,7 +19,21 @@
     "hartenjagen": "Hartenjagen",
     "hartenjagenDesc": "Strafpunten, daarna omlaag naar nul",
     "eenendertigen": "Eenendertigen",
-    "eenendertigenDesc": "Zo dicht mogelijk bij 31"
+    "eenendertigenDesc": "Zo dicht mogelijk bij 31",
+    "privacyLink": "Privacyverklaring"
+  },
+  "privacy": {
+    "title": "Privacyverklaring",
+    "updated": "Laatst bijgewerkt: 31 oktober 2026",
+    "intro": "Kaartscore is een score-app voor kaartspellen met vrienden. We respecteren je privacy en vragen zo weinig mogelijk gegevens.",
+    "dataTitle": "Welke gegevens?",
+    "dataBody": "Je typt zelf spelersnamen en scores in. Die gegevens blijven alleen op jouw apparaat, in het geheugen van de browser of app, zolang het spel bezig is.",
+    "storageTitle": "Opslag en accounts",
+    "storageBody": "Kaartscore heeft geen accounts en slaat geen geschiedenis op tussen spellen. Bij het afsluiten of herladen van de pagina gaan de scores van het lopende spel verloren.",
+    "networkTitle": "Internet en derden",
+    "networkBody": "De app speelt lokaal. We sturen je scores of namen niet naar een server. Als je de website opent, kan de hostingprovider standaard technische loggegevens (zoals IP-adres) vastleggen; dat gebeurt buiten de app om.",
+    "contactTitle": "Contact",
+    "contactBody": "Vragen over deze verklaring? Neem contact op via de GitHub-repository van Kaartscore (KiemoV/Kaartspel)."
   },
   "setup": {
     "title": "Instellingen",

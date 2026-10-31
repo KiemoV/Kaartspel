@@ -19,7 +19,21 @@
     "hartenjagen": "Hearts",
     "hartenjagenDesc": "Penalty points, then race down to zero",
     "eenendertigen": "Thirty-one",
-    "eenendertigenDesc": "Get as close to 31 as you can"
+    "eenendertigenDesc": "Get as close to 31 as you can",
+    "privacyLink": "Privacy policy"
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "updated": "Last updated: 31 October 2026",
+    "intro": "Kaartscore is a score app for card games with friends. We respect your privacy and collect as little data as possible.",
+    "dataTitle": "What data?",
+    "dataBody": "You enter player names and scores yourself. That data stays only on your device, in the browser or app memory, for as long as the game is running.",
+    "storageTitle": "Storage and accounts",
+    "storageBody": "Kaartscore has no accounts and does not store history between games. Closing or reloading the page discards the current game scores.",
+    "networkTitle": "Internet and third parties",
+    "networkBody": "The app runs locally. We do not send your scores or names to a server. When you open the website, the hosting provider may record standard technical logs (such as IP address); that happens outside the app.",
+    "contactTitle": "Contact",
+    "contactBody": "Questions about this policy? Contact us via the Kaartscore GitHub repository (KiemoV/Kaartspel)."
   },
   "setup": {
     "title": "Settings",

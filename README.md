@@ -24,6 +24,21 @@ npm run preview
 npm test
 ```
 
+## Privacy
+
+- In-app: start screen → Privacy
+- Stable store link: [`/privacy.html`](./public/privacy.html) (NL + EN)
+
+## Deploy (Vercel)
+
+```bash
+npm i -g vercel
+vercel link
+vercel --prod
+```
+
+Or import [github.com/KiemoV/Kaartspel](https://github.com/KiemoV/Kaartspel) in the Vercel dashboard (framework: Vite, output: `dist`).
+
 ## Notes
 
 - Installable offline via `vite-plugin-pwa`.

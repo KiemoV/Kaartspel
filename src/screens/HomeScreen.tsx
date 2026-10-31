@@ -6,9 +6,15 @@ interface Props {
   onSelect: (type: GameType) => void
   themeMode: ThemeMode
   onThemeChange: (mode: ThemeMode) => void
+  onPrivacy: () => void
 }
 
-export function HomeScreen({ onSelect, themeMode, onThemeChange }: Props) {
+export function HomeScreen({
+  onSelect,
+  themeMode,
+  onThemeChange,
+  onPrivacy,
+}: Props) {
   const { t, i18n } = useTranslation()
 
   const cycleTheme = () => {
@@ -78,6 +84,11 @@ export function HomeScreen({ onSelect, themeMode, onThemeChange }: Props) {
       </div>
 
       <p className="install-hint">{t('app.installHint')}</p>
+      <p className="install-hint">
+        <button type="button" className="link-btn" onClick={onPrivacy}>
+          {t('home.privacyLink')}
+        </button>
+      </p>
     </>
   )
 }
