@@ -1,0 +1,130 @@
+{
+  "app": {
+    "name": "Kaartscore",
+    "tagline": "Keep score. Keep playing.",
+    "installHint": "Installable as an app on your phone"
+  },
+  "nav": {
+    "language": "Language",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "back": "Back",
+    "home": "Home"
+  },
+  "home": {
+    "chooseGame": "Choose a game",
+    "toepen": "Toepen",
+    "toepenDesc": "Raise stakes until one remains",
+    "hartenjagen": "Hearts",
+    "hartenjagenDesc": "Penalty points, then race down to zero",
+    "eenendertigen": "Thirty-one",
+    "eenendertigenDesc": "Get as close to 31 as you can"
+  },
+  "setup": {
+    "title": "Settings",
+    "players": "Players",
+    "playerName": "Player {{n}} name",
+    "addPlayer": "Add player",
+    "removePlayer": "Remove",
+    "minPlayers": "At least 2 players",
+    "maxPlayers": "At most 10 players",
+    "start": "Start game",
+    "wheel": "Loser's wheel",
+    "wheelEnabled": "Enable wheel",
+    "wheelSet": "Set",
+    "wheelSetChallenges": "Challenges",
+    "wheelSetDrinks": "Drinks",
+    "wheelSetNonalcoholic": "Non-alcoholic",
+    "wheelSetCustom": "Custom set",
+    "wheelCustomPlaceholder": "Segment (one per line)",
+    "wheelTrigger": "When to spin",
+    "wheelTriggerEvery": "Every round for the loser",
+    "wheelTriggerElimination": "Only on elimination",
+    "wheelTriggerEnd": "At the end of the game",
+    "lockedNote": "Settings and wheel lock after you start."
+  },
+  "toepen": {
+    "maxScore": "Maximum score",
+    "startStake": "Starting stake",
+    "outRule": "Out when",
+    "outAbove": "Above the maximum",
+    "outAtOrAbove": "At or above the maximum",
+    "stake": "Stake",
+    "losers": "Loser(s)",
+    "confirmRound": "Confirm round"
+  },
+  "hartenjagen": {
+    "phase1Limit": "Phase 1 limit",
+    "phase2Target": "Phase 2 target",
+    "phaseSwitch": "Phase switch",
+    "phaseAll": "Everyone together",
+    "phasePerPlayer": "Per player",
+    "exactTarget": "Must finish exactly on target",
+    "exactYes": "Exact required",
+    "exactNo": "At or below is fine",
+    "phase": "Phase {{n}}",
+    "scores": "Penalty / subtract points",
+    "confirmRound": "Confirm round"
+  },
+  "eenendertigen": {
+    "mode": "Mode",
+    "modeLives": "Lives",
+    "modePoints": "Points",
+    "startLives": "Starting lives",
+    "swimming": "Swimming",
+    "swimmingOn": "On",
+    "swimmingOff": "Off",
+    "lowestTie": "Lowest-score tie",
+    "tieAll": "All lowest lose",
+    "tieChoose": "Choose one loser",
+    "pointsEnd": "Points mode end",
+    "fixedRounds": "Fixed number of rounds",
+    "pointsLimit": "Points limit",
+    "roundCount": "Number of rounds",
+    "handScore": "Hand score",
+    "distance": "Distance to 31",
+    "quick31": "31",
+    "quick305": "30.5",
+    "chooseLoser": "Choose the loser",
+    "confirmRound": "Confirm round",
+    "fillAll": "Fill in every hand score",
+    "livesLeft": "{{n}} lives",
+    "swimmingStatus": "Swimming",
+    "penalty": "Penalty"
+  },
+  "play": {
+    "round": "Round {{n}}",
+    "scoreboard": "Scoreboard",
+    "undo": "Undo",
+    "correct": "Correct",
+    "correctTitle": "Correct round",
+    "saveCorrection": "Save",
+    "cancel": "Cancel",
+    "statusActive": "Active",
+    "statusOut": "Out",
+    "statusWinner": "Winner",
+    "statusSwimming": "Swimming",
+    "leaveWarning": "You have a game in progress. Are you sure you want to leave?"
+  },
+  "wheel": {
+    "title": "Wheel",
+    "spin": "Spin",
+    "forPlayer": "For {{name}}",
+    "result": "Result",
+    "continue": "Continue",
+    "skip": "Skip"
+  },
+  "winner": {
+    "title": "Winner!",
+    "congrats": "{{name}} wins",
+    "playAgain": "Play again with same settings",
+    "newGame": "New game"
+  },
+  "common": {
+    "on": "On",
+    "off": "Off",
+    "yes": "Yes",
+    "no": "No"
+  }
+}

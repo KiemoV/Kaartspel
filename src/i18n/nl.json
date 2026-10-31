@@ -1,0 +1,130 @@
+{
+  "app": {
+    "name": "Kaartscore",
+    "tagline": "Houd de stand bij. Speel door.",
+    "installHint": "Installeerbaar als app op je telefoon"
+  },
+  "nav": {
+    "language": "Taal",
+    "themeLight": "Licht",
+    "themeDark": "Donker",
+    "themeSystem": "Systeem",
+    "back": "Terug",
+    "home": "Start"
+  },
+  "home": {
+    "chooseGame": "Kies een spel",
+    "toepen": "Toepen",
+    "toepenDesc": "Inzetten tot er één overblijft",
+    "hartenjagen": "Hartenjagen",
+    "hartenjagenDesc": "Strafpunten, daarna omlaag naar nul",
+    "eenendertigen": "Eenendertigen",
+    "eenendertigenDesc": "Zo dicht mogelijk bij 31"
+  },
+  "setup": {
+    "title": "Instellingen",
+    "players": "Spelers",
+    "playerName": "Naam speler {{n}}",
+    "addPlayer": "Speler toevoegen",
+    "removePlayer": "Verwijderen",
+    "minPlayers": "Minimaal 2 spelers",
+    "maxPlayers": "Maximaal 10 spelers",
+    "start": "Start spel",
+    "wheel": "Rad voor de verliezer",
+    "wheelEnabled": "Rad aanzetten",
+    "wheelSet": "Set",
+    "wheelSetChallenges": "Opdrachten",
+    "wheelSetDrinks": "Drankjes",
+    "wheelSetNonalcoholic": "Alcoholvrij",
+    "wheelSetCustom": "Eigen set",
+    "wheelCustomPlaceholder": "Vakje (één per regel)",
+    "wheelTrigger": "Wanneer draaien",
+    "wheelTriggerEvery": "Elke ronde voor de verliezer",
+    "wheelTriggerElimination": "Alleen bij uitschakeling",
+    "wheelTriggerEnd": "Aan het einde van het spel",
+    "lockedNote": "Na de start zijn instellingen en rad vergrendeld."
+  },
+  "toepen": {
+    "maxScore": "Maximumscore",
+    "startStake": "Startinzet",
+    "outRule": "Uit wanneer",
+    "outAbove": "Boven het maximum",
+    "outAtOrAbove": "Bij het bereiken van het maximum",
+    "stake": "Inzet",
+    "losers": "Verliezer(s)",
+    "confirmRound": "Ronde bevestigen"
+  },
+  "hartenjagen": {
+    "phase1Limit": "Grens fase 1",
+    "phase2Target": "Doel fase 2",
+    "phaseSwitch": "Fasewissel",
+    "phaseAll": "Iedereen tegelijk",
+    "phasePerPlayer": "Per speler",
+    "exactTarget": "Exact op het doel eindigen",
+    "exactYes": "Exact verplicht",
+    "exactNo": "Onder het doel mag ook",
+    "phase": "Fase {{n}}",
+    "scores": "Straf- / aftrekpunten",
+    "confirmRound": "Ronde bevestigen"
+  },
+  "eenendertigen": {
+    "mode": "Modus",
+    "modeLives": "Levens",
+    "modePoints": "Punten",
+    "startLives": "Startlevens",
+    "swimming": "Zwemmen",
+    "swimmingOn": "Aan",
+    "swimmingOff": "Uit",
+    "lowestTie": "Gelijkspel laagste",
+    "tieAll": "Alle laagsten verliezen",
+    "tieChoose": "Kies één verliezer",
+    "pointsEnd": "Einde puntenmodus",
+    "fixedRounds": "Vast aantal rondes",
+    "pointsLimit": "Puntengrens",
+    "roundCount": "Aantal rondes",
+    "handScore": "Handscore",
+    "distance": "Afstand tot 31",
+    "quick31": "31",
+    "quick305": "30,5",
+    "chooseLoser": "Kies de verliezer",
+    "confirmRound": "Ronde bevestigen",
+    "fillAll": "Vul alle handscores in",
+    "livesLeft": "{{n}} levens",
+    "swimmingStatus": "Zwemt",
+    "penalty": "Straf"
+  },
+  "play": {
+    "round": "Ronde {{n}}",
+    "scoreboard": "Stand",
+    "undo": "Ongedaan",
+    "correct": "Corrigeren",
+    "correctTitle": "Ronde corrigeren",
+    "saveCorrection": "Opslaan",
+    "cancel": "Annuleren",
+    "statusActive": "Actief",
+    "statusOut": "Uit",
+    "statusWinner": "Winnaar",
+    "statusSwimming": "Zwemt",
+    "leaveWarning": "Je hebt een lopend spel. Weet je zeker dat je wilt vertrekken?"
+  },
+  "wheel": {
+    "title": "Rad",
+    "spin": "Draaien",
+    "forPlayer": "Voor {{name}}",
+    "result": "Uitslag",
+    "continue": "Verder",
+    "skip": "Overslaan"
+  },
+  "winner": {
+    "title": "Winnaar!",
+    "congrats": "{{name}} wint",
+    "playAgain": "Opnieuw met dezelfde setting",
+    "newGame": "Nieuw spel"
+  },
+  "common": {
+    "on": "Aan",
+    "off": "Uit",
+    "yes": "Ja",
+    "no": "Nee"
+  }
+}
