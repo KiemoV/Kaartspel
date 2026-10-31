@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { applyRound, correctRound, createGame, undoLastRound } from './engine'
-import { toepenRoundPenalties } from './toepen'
+import { countToepenWinners, toepenRoundPenalties } from './toepen'
 import type { ToepenRoundInput } from '../types/game'
 
 describe('toepen', () => {
+  it('allows only one round winner in outcomes', () => {
+    expect(countToepenWinners({ p1: 'none', p2: 'lost', p3: 'fold' })).toBe(1)
+    expect(countToepenWinners({ p1: 'none', p2: 'none', p3: 'fold' })).toBe(2)
+    expect(countToepenWinners({ p1: 'lost', p2: 'fold' })).toBe(0)
+  })
+
   it('folders take fold stake; hand losers take final stake', () => {
     const penalties = toepenRoundPenalties({
       finalStake: 2,

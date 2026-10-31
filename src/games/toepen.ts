@@ -20,6 +20,13 @@ export function initialPlayersToepen(names: string[]): Player[] {
   }))
 }
 
+/** How many players are marked as round winners (outcome "none"). */
+export function countToepenWinners(
+  outcomes: Record<string, 'unset' | 'none' | 'fold' | 'lost'>,
+): number {
+  return Object.values(outcomes).filter((o) => o === 'none').length
+}
+
 /** Points each player receives from one toepen round (hand + swap). */
 export function toepenRoundPenalties(
   input: ToepenRoundInput,

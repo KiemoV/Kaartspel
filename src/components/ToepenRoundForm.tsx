@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toepenRoundPenalties } from '../games/toepen'
+import { countToepenWinners, toepenRoundPenalties } from '../games/toepen'
 import type {
   Player,
   ToepenRoundInput,
@@ -8,7 +8,7 @@ import type {
   ToepenSwap,
 } from '../types/game'
 
-type Outcome = 'none' | 'fold' | 'lost'
+type Outcome = 'unset' | 'none' | 'fold' | 'lost'
 
 interface PlayerSwapState {
   enabled: boolean
@@ -59,10 +59,24 @@ export function ToepenRoundForm({
   )
   const [outcomes, setOutcomes] = useState<Record<string, Outcome>>(() => {
     const map: Record<string, Outcome> = {}
+    if (!initial) {
+      for (const p of players) map[p.id] = 'unset'
+      return map
+    }
     for (const p of players) {
-      if (initial?.loserIds.includes(p.id)) map[p.id] = 'lost'
-      else if (initial?.folds.some((f) => f.playerId === p.id)) map[p.id] = 'fold'
+      if (initial.loserIds.includes(p.id)) map[p.id] = 'lost'
+      else if (initial.folds.some((f) => f.playerId === p.id)) map[p.id] = 'fold'
       else map[p.id] = 'none'
+    }
+    // Enforce single winner when loading older/invalid data
+    let seenWinner = false
+    for (const p of players) {
+      if (map[p.id] !== 'none') continue
+      if (!seenWinner) {
+        seenWinner = true
+      } else {
+        map[p.id] = 'lost'
+      }
     }
     return map
   })
@@ -79,7 +93,15 @@ export function ToepenRoundForm({
   )
 
   const setOutcome = (id: string, outcome: Outcome) => {
-    setOutcomes((prev) => ({ ...prev, [id]: outcome }))
+    setOutcomes((prev) => {
+      const next: Record<string, Outcome> = { ...prev, [id]: outcome }
+      if (outcome === 'none') {
+        for (const pid of Object.keys(next)) {
+          if (pid !== id && next[pid] === 'none') next[pid] = 'lost'
+        }
+      }
+      return next
+    })
     if (outcome === 'fold') {
       setFoldStakes((prev) => ({
         ...prev,
@@ -159,10 +181,15 @@ export function ToepenRoundForm({
   }, [players, outcomes, foldStakes, finalStake, startStake, swaps])
 
   const preview = toepenRoundPenalties(draft)
-  const hasResult =
-    draft.folds.length > 0 ||
-    draft.loserIds.length > 0 ||
-    draft.swaps.some((s) => s.lookerIds.length > 0)
+  const winnerCount = countToepenWinners(outcomes)
+  const incomplete = players.some((p) => (outcomes[p.id] ?? 'unset') === 'unset')
+  const hasHandResult = draft.folds.length > 0 || draft.loserIds.length > 0
+  const hasSwapPenalty = draft.swaps.some((s) => s.lookerIds.length > 0)
+  const singleWinnerOk = winnerCount === 1
+  const canSubmit =
+    !incomplete &&
+    singleWinnerOk &&
+    (hasHandResult || hasSwapPenalty)
 
   return (
     <section className="panel">
@@ -193,6 +220,7 @@ export function ToepenRoundForm({
 
       <div className="field">
         <label>{t('toepen.outcomes')}</label>
+        <p className="hint">{t('toepen.singleWinnerHint')}</p>
         <div className="toepen-outcomes">
           {players.map((p) => {
             const swap = swaps[p.id] ?? {
@@ -200,34 +228,35 @@ export function ToepenRoundForm({
               lookerIds: [],
               justified: false,
             }
+            const outcome = outcomes[p.id] ?? 'unset'
             return (
               <div className="toepen-outcome-row" key={p.id}>
                 <strong>{p.name}</strong>
                 <div className="toggle-grid three">
                   <button
                     type="button"
-                    className={outcomes[p.id] === 'none' ? 'is-on' : ''}
+                    className={outcome === 'none' ? 'is-on' : ''}
                     onClick={() => setOutcome(p.id, 'none')}
                   >
                     {t('toepen.outcomeNone')}
                   </button>
                   <button
                     type="button"
-                    className={outcomes[p.id] === 'fold' ? 'is-on' : ''}
+                    className={outcome === 'fold' ? 'is-on' : ''}
                     onClick={() => setOutcome(p.id, 'fold')}
                   >
                     {t('toepen.outcomeFold')}
                   </button>
                   <button
                     type="button"
-                    className={outcomes[p.id] === 'lost' ? 'is-on' : ''}
+                    className={outcome === 'lost' ? 'is-on' : ''}
                     onClick={() => setOutcome(p.id, 'lost')}
                   >
                     {t('toepen.outcomeLost')}
                   </button>
                 </div>
 
-                {outcomes[p.id] === 'fold' && (
+                {outcome === 'fold' && (
                   <div className="stepper compact">
                     <span className="hint">{t('toepen.foldStake')}</span>
                     <button
@@ -260,7 +289,7 @@ export function ToepenRoundForm({
                     </button>
                   </div>
                 )}
-                {outcomes[p.id] === 'lost' && (
+                {outcome === 'lost' && (
                   <p className="hint">
                     {t('toepen.lostAt', { n: finalStake })}
                   </p>
@@ -348,10 +377,17 @@ export function ToepenRoundForm({
         </div>
       </div>
 
+      {!singleWinnerOk && !incomplete && (
+        <p className="hint">{t('toepen.singleWinnerError')}</p>
+      )}
+      {incomplete && (
+        <p className="hint">{t('toepen.outcomesIncomplete')}</p>
+      )}
+
       <button
         type="button"
         className="btn btn-primary btn-block"
-        disabled={!hasResult}
+        disabled={!canSubmit}
         onClick={() => onSubmit(draft)}
       >
         {correcting ? t('play.saveCorrection') : t('toepen.confirmRound')}
