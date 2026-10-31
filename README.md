@@ -29,7 +29,14 @@ npm test
 - In-app: start screen → Privacy
 - Stable store link: [`/privacy.html`](./public/privacy.html) (NL + EN)
 
+## Live
+
+- **GitHub Pages:** https://kiemov.github.io/Kaartspel/
+- **Privacy:** https://kiemov.github.io/Kaartspel/privacy.html
+
 ## Deploy (Vercel)
+
+Import [github.com/KiemoV/Kaartspel](https://github.com/KiemoV/Kaartspel) in the Vercel dashboard (framework: Vite, output: `dist`), or:
 
 ```bash
 npm i -g vercel
@@ -37,7 +44,7 @@ vercel link
 vercel --prod
 ```
 
-Or import [github.com/KiemoV/Kaartspel](https://github.com/KiemoV/Kaartspel) in the Vercel dashboard (framework: Vite, output: `dist`).
+Note: for Vercel root hosting, build without `BASE_PATH` (default `/`). GitHub Pages builds with `BASE_PATH=/Kaartspel/`.
 
 ## Notes
 
