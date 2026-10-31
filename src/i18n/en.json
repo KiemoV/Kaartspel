@@ -21,6 +21,8 @@
     "hartenjagenDesc": "Penalty points, then race down to zero",
     "eenendertigen": "Thirty-one",
     "eenendertigenDesc": "Get as close to 31 as you can",
+    "vrij": "Free play",
+    "vrijDesc": "Keep score until a maximum",
     "privacyLink": "Privacy policy"
   },
   "privacy": {
@@ -87,6 +89,14 @@
     "swapNo": "No",
     "swapJustifiedHint": "Looker(s) get +1, regardless of the round.",
     "swapUnjustifiedHint": "Requester gets +1, regardless of the round.",
+    "confirmRound": "Confirm round"
+  },
+  "vrij": {
+    "maxScore": "Maximum score",
+    "winRule": "Win when",
+    "winAtOrAbove": "At or above",
+    "winAbove": "Strictly above the maximum",
+    "scores": "Points this round",
     "confirmRound": "Confirm round"
   },
   "hartenjagen": {

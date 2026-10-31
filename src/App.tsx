@@ -32,6 +32,7 @@ export default function App() {
       toepen: result.toepen,
       hartenjagen: result.hartenjagen,
       eenendertigen: result.eenendertigen,
+      vrij: result.vrij,
       wheel: result.wheel,
     })
     setGame(next)

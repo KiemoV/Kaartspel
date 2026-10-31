@@ -5,6 +5,7 @@ import type {
   GameType,
   HartenjagenSettings,
   ToepenSettings,
+  VrijSettings,
   WheelSettings,
   WheelSetId,
   WheelTrigger,
@@ -13,6 +14,7 @@ import {
   DEFAULT_EENENDERTIGEN,
   DEFAULT_HARTENJAGEN,
   DEFAULT_TOEPEN,
+  DEFAULT_VRIJ,
   DEFAULT_WHEEL,
 } from '../types/game'
 
@@ -21,6 +23,7 @@ export interface SetupResult {
   toepen: ToepenSettings
   hartenjagen: HartenjagenSettings
   eenendertigen: EenendertigenSettings
+  vrij: VrijSettings
   wheel: WheelSettings
 }
 
@@ -40,6 +43,7 @@ export function SetupScreen({ type, onBack, onStart }: Props) {
   const [eenendertigen, setEenendertigen] = useState<EenendertigenSettings>({
     ...DEFAULT_EENENDERTIGEN,
   })
+  const [vrij, setVrij] = useState<VrijSettings>({ ...DEFAULT_VRIJ })
   const [wheel, setWheel] = useState<WheelSettings>({ ...DEFAULT_WHEEL })
 
   const title =
@@ -47,7 +51,9 @@ export function SetupScreen({ type, onBack, onStart }: Props) {
       ? t('home.toepen')
       : type === 'hartenjagen'
         ? t('home.hartenjagen')
-        : t('home.eenendertigen')
+        : type === 'vrij'
+          ? t('home.vrij')
+          : t('home.eenendertigen')
 
   const validNames = names.map((n) => n.trim()).filter(Boolean)
   const canStart = validNames.length >= 2 && validNames.length <= 10
@@ -248,6 +254,46 @@ export function SetupScreen({ type, onBack, onStart }: Props) {
                 }
               >
                 {t('hartenjagen.exactYes')}
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {type === 'vrij' && (
+        <section className="panel">
+          <h2>{t('setup.title')}</h2>
+          <div className="field">
+            <label htmlFor="vrijMax">{t('vrij.maxScore')}</label>
+            <input
+              id="vrijMax"
+              type="number"
+              min={1}
+              value={vrij.maxScore}
+              onChange={(e) =>
+                setVrij((s) => ({
+                  ...s,
+                  maxScore: Number(e.target.value) || 100,
+                }))
+              }
+            />
+          </div>
+          <div className="field">
+            <label>{t('vrij.winRule')}</label>
+            <div className="toggle-grid">
+              <button
+                type="button"
+                className={vrij.winAtOrAbove ? 'is-on' : ''}
+                onClick={() => setVrij((s) => ({ ...s, winAtOrAbove: true }))}
+              >
+                {t('vrij.winAtOrAbove')}
+              </button>
+              <button
+                type="button"
+                className={!vrij.winAtOrAbove ? 'is-on' : ''}
+                onClick={() => setVrij((s) => ({ ...s, winAtOrAbove: false }))}
+              >
+                {t('vrij.winAbove')}
               </button>
             </div>
           </div>
@@ -523,6 +569,7 @@ export function SetupScreen({ type, onBack, onStart }: Props) {
             toepen,
             hartenjagen,
             eenendertigen,
+            vrij,
             wheel,
           })
         }

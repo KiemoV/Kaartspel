@@ -21,6 +21,8 @@
     "hartenjagenDesc": "Strafpunten, daarna omlaag naar nul",
     "eenendertigen": "Eenendertigen",
     "eenendertigenDesc": "Zo dicht mogelijk bij 31",
+    "vrij": "Vrij spel",
+    "vrijDesc": "Punten bijhouden tot een maximum",
     "privacyLink": "Privacyverklaring"
   },
   "privacy": {
@@ -87,6 +89,14 @@
     "swapNo": "Nee",
     "swapJustifiedHint": "Kijker(s) krijgen +1, los van de ronde.",
     "swapUnjustifiedHint": "Aanvrager krijgt +1, los van de ronde.",
+    "confirmRound": "Ronde bevestigen"
+  },
+  "vrij": {
+    "maxScore": "Maximumscore",
+    "winRule": "Winnen bij",
+    "winAtOrAbove": "Bereiken of hoger",
+    "winAbove": "Strikt boven het maximum",
+    "scores": "Punten deze ronde",
     "confirmRound": "Ronde bevestigen"
   },
   "hartenjagen": {

@@ -7,12 +7,14 @@ import type {
   Round,
   RoundInput,
   ToepenSettings,
+  VrijSettings,
   WheelSettings,
 } from '../types/game'
 import {
   DEFAULT_EENENDERTIGEN,
   DEFAULT_HARTENJAGEN,
   DEFAULT_TOEPEN,
+  DEFAULT_VRIJ,
   DEFAULT_WHEEL,
 } from '../types/game'
 import {
@@ -30,6 +32,11 @@ import {
   checkEndToepen,
   initialPlayersToepen,
 } from './toepen'
+import {
+  applyVrijRounds,
+  checkEndVrij,
+  initialPlayersVrij,
+} from './vrij'
 
 function baseNames(players: Player[]): string[] {
   return players.map((p) => p.name)
@@ -42,6 +49,7 @@ export function createGame(
     toepen?: Partial<ToepenSettings>
     hartenjagen?: Partial<HartenjagenSettings>
     eenendertigen?: Partial<EenendertigenSettings>
+    vrij?: Partial<VrijSettings>
     wheel?: Partial<WheelSettings>
   },
 ): Game {
@@ -69,6 +77,18 @@ export function createGame(
       status: 'playing',
       winnerId: null,
       phase: 1,
+    }
+  }
+
+  if (type === 'vrij') {
+    const vrij = { ...DEFAULT_VRIJ, ...partial?.vrij }
+    return {
+      type,
+      settings: { type: 'vrij', vrij, wheel },
+      players: initialPlayersVrij(names),
+      rounds: [],
+      status: 'playing',
+      winnerId: null,
     }
   }
 
@@ -128,6 +148,25 @@ export function recalculate(game: Game): Game {
       players,
       winnerId,
       phase,
+      status: finished ? 'finished' : 'playing',
+    }
+  }
+
+  if (game.type === 'vrij' && game.settings.type === 'vrij') {
+    const base = initialPlayersVrij(names).map((p, i) => ({
+      ...p,
+      id: ids[i] ?? p.id,
+    }))
+    const { players, winnerId } = applyVrijRounds(
+      base,
+      game.rounds,
+      game.settings.vrij,
+    )
+    const finished = checkEndVrij(winnerId)
+    return {
+      ...game,
+      players,
+      winnerId,
       status: finished ? 'finished' : 'playing',
     }
   }
@@ -210,6 +249,7 @@ export function restartGame(game: Game): Game {
         game.settings.type === 'eenendertigen'
           ? game.settings.eenendertigen
           : undefined,
+      vrij: game.settings.type === 'vrij' ? game.settings.vrij : undefined,
       wheel: game.settings.wheel,
     },
   )
@@ -226,7 +266,6 @@ export function lastRoundLoserIds(game: Game): string[] {
   const after = game
 
   if (game.type === 'toepen') {
-    // Anyone who scored points this round (fold, loss, or swap penalty)
     return after.players
       .filter((p) => {
         const prev = before.players.find((b) => b.id === p.id)
@@ -250,7 +289,6 @@ export function lastRoundLoserIds(game: Game): string[] {
         })
         .map((p) => p.id)
     }
-    // Points mode: no per-round "loser" for lives; highest distance that round
     const hands = (last.input as { hands: Record<string, number> }).hands
     const dists = Object.entries(hands).map(([id, hand]) => ({
       id,
@@ -261,8 +299,7 @@ export function lastRoundLoserIds(game: Game): string[] {
     return dists.filter((d) => d.dist === max).map((d) => d.id)
   }
 
-  if (game.type === 'hartenjagen') {
-    // Highest score taken that round among active
+  if (game.type === 'hartenjagen' || game.type === 'vrij') {
     const scores = (last.input as { scores: Record<string, number> }).scores
     const entries = Object.entries(scores)
     if (entries.length === 0) return []

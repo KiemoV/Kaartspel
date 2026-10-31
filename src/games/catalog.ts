@@ -28,4 +28,10 @@ export const GAME_CATALOG: GameCatalogItem[] = [
     descKey: 'home.eenendertigenDesc',
     mark: '31',
   },
+  {
+    type: 'vrij',
+    titleKey: 'home.vrij',
+    descKey: 'home.vrijDesc',
+    mark: '+',
+  },
 ]

@@ -1,4 +1,4 @@
-export type GameType = 'toepen' | 'hartenjagen' | 'eenendertigen'
+export type GameType = 'toepen' | 'hartenjagen' | 'eenendertigen' | 'vrij'
 
 export type PlayerStatus = 'active' | 'out' | 'winner' | 'swimming'
 
@@ -55,10 +55,18 @@ export interface EenendertigenSettings {
   pointsLimit: number
 }
 
+/** Free scoring: add points each round until someone hits the maximum. */
+export interface VrijSettings {
+  maxScore: number
+  /** Win when reaching or exceeding the maximum. */
+  winAtOrAbove: boolean
+}
+
 export type GameSettings =
   | { type: 'toepen'; toepen: ToepenSettings; wheel: WheelSettings }
   | { type: 'hartenjagen'; hartenjagen: HartenjagenSettings; wheel: WheelSettings }
   | { type: 'eenendertigen'; eenendertigen: EenendertigenSettings; wheel: WheelSettings }
+  | { type: 'vrij'; vrij: VrijSettings; wheel: WheelSettings }
 
 /** Player folded when the stake was raised; they take this many points. */
 export interface ToepenFold {
@@ -95,10 +103,16 @@ export interface EenendertigenRoundInput {
   chosenLoserId?: string
 }
 
+export interface VrijRoundInput {
+  /** Points scored this round per player. */
+  scores: Record<string, number>
+}
+
 export type RoundInput =
   | ToepenRoundInput
   | HartenjagenRoundInput
   | EenendertigenRoundInput
+  | VrijRoundInput
 
 export interface Round {
   id: string
@@ -139,6 +153,11 @@ export const DEFAULT_EENENDERTIGEN: EenendertigenSettings = {
   pointsEnd: 'fixed_rounds',
   fixedRounds: 0, // 0 = use player count at start
   pointsLimit: 100,
+}
+
+export const DEFAULT_VRIJ: VrijSettings = {
+  maxScore: 100,
+  winAtOrAbove: true,
 }
 
 export const DEFAULT_WHEEL: WheelSettings = {

@@ -166,7 +166,7 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
     if (!round) return
     setCorrectingId(roundId)
     setToepenFormKey((k) => k + 1)
-    if (game.type === 'hartenjagen') {
+    if (game.type === 'hartenjagen' || game.type === 'vrij') {
       const input = round.input as HartenjagenRoundInput
       const mapped: Record<string, string> = {}
       for (const [id, v] of Object.entries(input.scores)) {
@@ -249,7 +249,9 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
       ? t('home.toepen')
       : game.type === 'hartenjagen'
         ? t('home.hartenjagen')
-        : t('home.eenendertigen')
+        : game.type === 'vrij'
+          ? t('home.vrij')
+          : t('home.eenendertigen')
 
   const correctingToepen =
     correctingId && game.type === 'toepen'
@@ -382,14 +384,19 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
           />
         )}
 
-      {game.status === 'playing' && game.type === 'hartenjagen' && (
+      {game.status === 'playing' &&
+        (game.type === 'hartenjagen' || game.type === 'vrij') && (
         <section className="panel">
-          <h2>{t('hartenjagen.scores')}</h2>
+          <h2>
+            {game.type === 'vrij' ? t('vrij.scores') : t('hartenjagen.scores')}
+          </h2>
           {activePlayers(game).map((p) => (
             <div className="field" key={p.id}>
               <label htmlFor={`hj-${p.id}`}>
                 {p.name}
-                {p.inPhase2 ? ` · ${t('hartenjagen.phase', { n: 2 })}` : ''}
+                {game.type === 'hartenjagen' && p.inPhase2
+                  ? ` · ${t('hartenjagen.phase', { n: 2 })}`
+                  : ''}
               </label>
               <input
                 id={`hj-${p.id}`}
@@ -408,7 +415,9 @@ export function PlayScreen({ game, onChange, onFinished, onHome }: Props) {
           >
             {correctingId
               ? t('play.saveCorrection')
-              : t('hartenjagen.confirmRound')}
+              : game.type === 'vrij'
+                ? t('vrij.confirmRound')
+                : t('hartenjagen.confirmRound')}
           </button>
         </section>
       )}

@@ -86,7 +86,7 @@ function summarizeRound(
     if (scored.length > 0) {
       lines.push(t('history.totalLine', { detail: scored.join(' · ') }))
     }
-  } else if (game.type === 'hartenjagen') {
+  } else if (game.type === 'hartenjagen' || game.type === 'vrij') {
     const input = round.input as HartenjagenRoundInput
     for (const [id, score] of Object.entries(input.scores)) {
       lines.push(
